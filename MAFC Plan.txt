@@ -1,0 +1,24 @@
+MAFC Plan
+
+Terqles is the main character
+Defeat the Demon King who has kidnapped princess within X turns
+
+move on an overworld that expands into:
+4 areas + final boss
+
+1. Bandit mountain pass - defend bandits from invincible evil nuns - you must shove them and lock them into rooms.
+  reward: recruit bandit and get some gold?
+2. Town - shop, visit arena, hire mercenary
+  maybe get some sidequest npcs idk
+3. Desert - fire traps abound, fight off monsters
+  reward: recruit wyvern rider and get some weapons
+4. Snow castle - hidden items e.g. stat boosters?
+  reward: recruit cleric and get some heals/staves idk
+
+5. Boss dungeon
+  In the final area, each of your allies who is alive will call one of their friends to join you
+    Bandit brings Ranger
+    Merc brings Paladin
+    Wyvern brings General
+    Cleric brings Manakete? Sage?
+
