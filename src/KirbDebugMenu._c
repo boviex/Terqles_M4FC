@@ -1,0 +1,236 @@
+#include "Main.h"
+#include "lib.h"
+
+u8 WaitEffect() {
+	//Set the unit pow to 99
+	(*sCurrentUnit)->pow = 99;
+	
+	//unit advances one x when waiting
+	sAction->newX = ((*sCurrentUnit)->xPos)+1;
+	
+	//Tell the game the unit waited
+	sAction->actionTaken = Wait;
+	
+	//End function
+	return KillMenu|PlayBeep|ClearMenuGfx;
+}
+
+u8 EndEffect() {
+	New6C((u32 *)Debug6C, 3);
+	return KillMenu|PlayBeep|ClearMenuGfx;
+}
+
+u8 WaitUpdate() {
+	if ((sInput->currentPress & InputL) != 0) {
+		New6C((u32 *)Debug6C, 3);
+	}
+	return FALSE;
+}
+
+void DebugScreenSetup(UnitEditorProc *CurrentProc) {
+	//Make it so the bg buffers update
+	SetupBG(0);
+	
+	//Load the background graphics and palette and tsa(generate it)
+	LZ77UncompVram(0x8B12DB4, 0x6008000);
+	MemCopy(0x8B1754C, (0x020228A8 + 14 * 0x20), 0x20);
+	GenerateBGTsa((u16 *)BG3Buffer, 0x280, 15);
+	
+	MemCopy(0x859ED70, (0x020228A8 + 16 * 0x20), 0x20);
+	//Load both debug fone(obj one will be used later on)
+	LoadDebugFont(2, 0);
+	LoadeOBJDebugFont(-1, 14);
+	
+	//Print a welcome message
+	DebugPrint(BGLoc(BG2Buffer, 0, 1), "Welcome To The Custom Debug");
+	DebugPrint(BGLoc(BG2Buffer, 0, 2), "Screen! btw this is useless");
+	
+	//Prints stats
+	DebugPrint(BGLoc(BG2Buffer, 6, 5), "Power");
+	DebugPrint(BGLoc(BG2Buffer, 6, 6), "Skill");
+	DebugPrint(BGLoc(BG2Buffer, 6, 7), "Speed");
+	DebugPrint(BGLoc(BG2Buffer, 6, 8), "Luck");
+	DebugPrint(BGLoc(BG2Buffer, 6, 9), "Defense");
+	DebugPrint(BGLoc(BG2Buffer, 6, 10), "Resistance");
+	DebugPrint(BGLoc(BG2Buffer, 6, 11), "Max HP");
+	DebugPrint(BGLoc(BG2Buffer, 6, 12), "Current HP");
+	DebugPrint(BGLoc(BG2Buffer, 6, 13), "Constitution");
+	DebugPrint(BGLoc(BG2Buffer, 6, 14), "Move");
+	DebugPrint(BGLoc(BG2Buffer, 6, 15), "X Position");
+	DebugPrint(BGLoc(BG2Buffer, 6, 16), "Y Position");
+	
+	//Setup the unit editor™
+	CurrentProc->UnitPoolIndex = 0;
+	SetupDebugUnitEditor(CurrentProc, sPlayerUnits);
+}
+
+void DebugScreenLoop(UnitEditorProc *CurrentProc) {
+	if ((sInput->currentPress & InputB) != 0 && CurrentProc->KonamiCodeCounter != 10) {
+		Clear6CLoop((Proc *)CurrentProc);
+		PlaySound(0x6B); 
+	}
+	if ((sInput->newPress & InputStart) != 0) {
+		CurrentProc->UnitPoolIndex = 0;
+		if (CurrentProc->CurrentUnitPool == 0) CurrentProc->CurrentUnitPool = 1;
+		else CurrentProc->CurrentUnitPool = 0;
+	}
+	else {
+	UpdateBG3HOffset();
+	if (CurrentProc->CurrentUnitPool == 0) UpdateDebugUnitEditor(CurrentProc, sPlayerUnits);
+	else UpdateDebugUnitEditor(CurrentProc, sEnemyUnits);
+	CheckKonamiCode(CurrentProc);
+	}
+}
+
+void GenerateBGTsa(u16 *MapOffset, u32 NumberOfTiles, u8 PaletteId) {
+	for(int i = 0; i < NumberOfTiles; i++) {
+		MapOffset[i] = (i | (PaletteId << 12));
+	}
+}
+
+void SetupDebugUnitEditor(UnitEditorProc *CurrentProc, UnitStruct *CurrentUnitPool) {
+	CurrentProc->CurrentTextToDisplay = CurrentUnitPool[CurrentProc->UnitPoolIndex].unitDataPtr->NameTID;
+	CurrentProc->Stats[0] = CurrentUnitPool[CurrentProc->UnitPoolIndex].pow;
+	CurrentProc->Stats[1] = CurrentUnitPool[CurrentProc->UnitPoolIndex].skl;
+	CurrentProc->Stats[2] = CurrentUnitPool[CurrentProc->UnitPoolIndex].spd;
+	CurrentProc->Stats[3] = CurrentUnitPool[CurrentProc->UnitPoolIndex].lck;
+	CurrentProc->Stats[4] = CurrentUnitPool[CurrentProc->UnitPoolIndex].def;
+	CurrentProc->Stats[5] = CurrentUnitPool[CurrentProc->UnitPoolIndex].res;
+	CurrentProc->Stats[6] = CurrentUnitPool[CurrentProc->UnitPoolIndex].maxHP;
+	CurrentProc->Stats[7] = CurrentUnitPool[CurrentProc->UnitPoolIndex].curHP;
+}
+
+void UpdateDebugUnitEditor(UnitEditorProc *CurrentProc, UnitStruct *CurrentUnitPool) {
+	//Check for R
+	if ((sInput->newPress & InputR) != 0) {
+		if (CurrentUnitPool[CurrentProc->UnitPoolIndex + 1].unitDataPtr  != 0) {
+		CurrentProc->UnitPoolIndex++;
+		SetupDebugUnitEditor(CurrentProc, CurrentUnitPool);
+		}
+	}
+	
+	//Check for L
+	if ((sInput->newPress & InputL) != 0) {
+		if (CurrentUnitPool[CurrentProc->UnitPoolIndex - 1].unitDataPtr  != 0) {
+		CurrentProc->UnitPoolIndex--;
+		SetupDebugUnitEditor(CurrentProc, CurrentUnitPool);
+		}
+	}	
+	
+	//Check for down
+	if ((sInput->newPress & InputDown) != 0) {
+		if (CurrentProc->CursorIndex < UnitEditor_ENTRIES) {
+			CurrentProc->CursorIndex++;
+		}
+		else CurrentProc->CursorIndex = 0;
+	}	
+	
+	//Check for up
+	if ((sInput->newPress & InputUp) != 0) {
+		if (CurrentProc->CursorIndex != 0) {
+			CurrentProc->CursorIndex--;
+		}
+		else CurrentProc->CursorIndex = UnitEditor_ENTRIES;
+	}	
+	
+	//Check for right
+	if ((sInput->newPress & InputRight) != 0) {
+		CurrentProc->Stats[CurrentProc->CursorIndex]++;
+	}	
+	
+	//Check for left
+	if ((sInput->newPress & InputLeft) != 0) {
+		CurrentProc->Stats[CurrentProc->CursorIndex]--;
+	}	
+
+	//Check for a
+	if ((sInput->newPress & InputA) != 0) {
+		CurrentUnitPool[CurrentProc->UnitPoolIndex].pow = CurrentProc->Stats[0];
+		CurrentUnitPool[CurrentProc->UnitPoolIndex].skl = CurrentProc->Stats[1];
+		CurrentUnitPool[CurrentProc->UnitPoolIndex].spd = CurrentProc->Stats[2];
+		CurrentUnitPool[CurrentProc->UnitPoolIndex].lck = CurrentProc->Stats[3];
+		CurrentUnitPool[CurrentProc->UnitPoolIndex].def = CurrentProc->Stats[4];
+		CurrentUnitPool[CurrentProc->UnitPoolIndex].res = CurrentProc->Stats[5];
+		CurrentUnitPool[CurrentProc->UnitPoolIndex].maxHP = CurrentProc->Stats[6];
+		CurrentUnitPool[CurrentProc->UnitPoolIndex].curHP = CurrentProc->Stats[7];
+	}	
+
+	//Get the unit index/name and print it
+	char UnitName[0x20];
+	UncompTID(CurrentUnitPool[CurrentProc->UnitPoolIndex].unitDataPtr->NameTID, UnitName);
+	OBJPrintDec(10, 25, CurrentProc->UnitPoolIndex, 3);
+	OBJPrintString(48, 25, UnitName);
+	
+	//Get the class name and prints it
+	char ClassName[0x20];
+	UncompTID(CurrentUnitPool[CurrentProc->UnitPoolIndex].classDataPtr->nameTextId, ClassName);
+	OBJPrintDec(10, 146, CurrentUnitPool[CurrentProc->UnitPoolIndex].classDataPtr->number, 3);
+	OBJPrintString(48, 146, ClassName);
+	
+	//Prints the stats
+	OBJPrintDec(10, 40, CurrentProc->Stats[0], 3);
+	OBJPrintDec(10, 48, CurrentProc->Stats[1], 3);
+	OBJPrintDec(10, 56, CurrentProc->Stats[2], 3);
+	OBJPrintDec(10, 64, CurrentProc->Stats[3], 3);
+	OBJPrintDec(10, 72, CurrentProc->Stats[4], 3);
+	OBJPrintDec(10, 80, CurrentProc->Stats[5], 3);
+	OBJPrintDec(10, 88, CurrentProc->Stats[6], 3);
+	OBJPrintDec(10, 96, CurrentProc->Stats[7], 3);
+	DrawCursor(CursorLocationTable[CurrentProc->CursorIndex].x,CursorLocationTable[CurrentProc->CursorIndex].y);
+}
+
+void CheckKonamiCode(UnitEditorProc *CurrentProc) {
+	if ((sInput->newPress & ButtonCombo[CurrentProc->KonamiCodeCounter]) != 0) {
+		CurrentProc->KonamiCodeCounter++;
+	}
+	if (CurrentProc->KonamiCodeCounter == 11) {
+	DebugPrint(BGLoc(BG2Buffer, 10, 18), "Konami Code");
+	}
+}
+
+const _ProcCode Debug6C[] = {
+	_6C_SET_NAME("E_Debug"),
+	
+	//Setting Up
+	_6C_CALL_ROUTINE(LockGameLogic),
+	_6C_CALL_ROUTINE_ARG(FadeToBlack, 0x10),
+	_6C_CALL_ROUTINE(ClearOAM),
+	_6C_WHILE_ROUTINE(ClearPalette),
+	_6C_CALL_ROUTINE_ARG(FadeOut, 0x10),
+	_6C_CALL_ROUTINE(DebugScreenSetup),
+	
+	//Main Logic
+	_6C_LOOP_ROUTINE(DebugScreenLoop),
+	
+	//After Getting Out Of Main Updater
+	_6C_CALL_ROUTINE_2(FixBG3Cam), //Replacing the BG3 Offset where it needs to be
+	_6C_CALL_ROUTINE(LoadMapSprites),
+	_6C_CALL_ROUTINE(LoadMap),
+	_6C_CALL_ROUTINE(UnlockGameLogic),
+	_6C_END
+	};	
+
+const LocationTable CursorLocationTable[] = {
+	{	10, 40-4	},
+	{	10, 48-4	},
+	{	10, 56-4	},
+	{	10, 64-4	},
+	{	10, 72-4	},
+	{	10, 80-4	},
+	{	10, 88-4	},
+	{	10, 96-4	},
+};
+
+const u16 ButtonCombo[] = {
+	InputUp,
+	InputUp,
+	InputDown,
+	InputDown,
+	InputLeft,
+	InputRight,
+	InputLeft,
+	InputRight,
+	InputA,
+	InputB,
+	InputStart
+};

@@ -2,6 +2,8 @@
 
 copy FE8_clean.gba Terqles_M4FC.gba
 
+make events -j
+
 cd "%~dp0Tables"
 
 echo: | (c2ea "%~dp0FE8_clean.gba")
