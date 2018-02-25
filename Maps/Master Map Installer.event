@@ -13,67 +13,7 @@
 #include "Ch1.event"
 }
 {
-#include "Ch10.event"
-}
-{
-#include "Ch11.event"
-}
-{
-#include "Ch12.event"
-}
-{
-#include "Ch13.event"
-}
-{
-#include "Ch14.event"
-}
-{
-#include "Ch15.event"
-}
-{
-#include "Ch16.event"
-}
-{
-#include "Ch17.event"
-}
-{
-#include "Ch18.event"
-}
-{
-#include "Ch19.event"
-}
-{
 #include "Ch2.event"
-}
-{
-#include "Ch20.event"
-}
-{
-#include "Ch21.event"
-}
-{
-#include "Ch22.event"
-}
-{
-#include "Ch23.event"
-}
-{
-#include "Ch24.event"
-}
-{
-#include "Ch25.event"
-}
-{
-#include "Ch26.event"
-}
-{
-#include "Ch27.event"
-}
-{
-#include "Ch28.event"
-}
-{
-#include "Ch29.event"
 }
 {
 #include "Ch3.event"
@@ -85,20 +25,14 @@
 #include "Ch5.event"
 }
 {
-#include "Ch6.event"
+#include "map.event"
 }
-{
-#include "Ch7.event"
-}
-{
-#include "Ch8.event"
-}
-{
-#include "Ch9.event"
-}
-{
-#include "Final.event"
-}
-{
-#include "Prologue.event"
-}
+// {
+// #include "Temp\desert.event"
+// }
+// {
+// #include "Temp\final_sml.event"
+// }
+// {
+// #include "Temp\town.event"
+// }

@@ -54,6 +54,19 @@ EventPointerTable(0x8b, ch24palette)
 EventPointerTable(0x8c, SnowPalette)
 EventPointerTable(0x8d, SnowTileConfig)
 
+EventPointerTable(0x8e, OverworldImg)
+EventPointerTable(0x8f, OverworldConfig)
+EventPointerTable(0x90, OverworldPalette)
+
+OverworldImg:
+#incext compress tileset.img.bin
+
+OverworldConfig:
+#incext compress tileset.conf.bin
+
+OverworldPalette:
+#incbin tileset.pal.bin
+
 #include "BattleAnimPointers.event"
 
 TikiTransformPal:
