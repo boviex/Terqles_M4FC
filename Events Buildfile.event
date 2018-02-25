@@ -1,0 +1,16 @@
+#ifdef _FE8_
+    #include "EAstdlib.event"
+    #include "Custom Definitions.event"
+    #include "text/text Definitions.event"
+    #include "symbols.txt"
+        // #define __DEBUG__ //allow seizes at start of chapters
+
+    ORG EndOfFreeSpace
+    
+    //Events
+    #include "Events/Master Events Installer.event"
+    #include "Events/World Map Events Installer.event"
+
+#else
+    ERROR You are not assembling FE8 events!
+#endif

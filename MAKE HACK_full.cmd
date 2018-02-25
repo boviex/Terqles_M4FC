@@ -14,7 +14,7 @@ echo: | (textprocess_v2 text_buildfile.txt)
 
 cd "%~dp0Event Assembler"
 
-Core A FE8 "-output:%~dp0Terqles_M4FC.gba" "-input:%~dp0ROM Buildfile.event"
+Core A FE8 "-output:%~dp0Terqles_M4FC.gba" "-input:%~dp0ROM Buildfile.event" "-symOutput:%~dp0symbols.txt"
 
 cd "%~dp0ups"
 
