@@ -16,6 +16,7 @@ TurnBasedEvents:
 END_MAIN
 
 CharacterBasedEvents:
+CharacterEvent(0, GotoMap1, Void, Leeroy)
 END_MAIN
 
 LocationBasedEvents:
@@ -71,6 +72,10 @@ ALIGN 4
 Traps2:
 ENDTRAP
 ALIGN 4
+
+GotoMap1:
+LOMA 0x1
+ENDA
 
 BeginningScene:
 CHECK_TUTORIAL
