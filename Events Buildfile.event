@@ -10,6 +10,7 @@
     //Events
     #include "Events/Master Events Installer.event"
     #include "Events/World Map Events Installer.event"
+    #include "Maps/Master Map Installer.event"
 
 #else
     ERROR You are not assembling FE8 events!

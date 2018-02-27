@@ -74,7 +74,7 @@ ENDTRAP
 ALIGN 4
 
 GotoMap1:
-LOMA 0x1
+MNC3 0x1
 ENDA
 
 BeginningScene:
